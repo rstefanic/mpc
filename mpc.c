@@ -144,8 +144,10 @@ static mpc_input_t *mpc_input_new_nstring(const char *filename, const char *stri
 
   i->state = mpc_state_new();
 
-  i->string = malloc(length + 1);
-  strncpy(i->string, string, length);
+  size_t length_size = length + 1;
+
+  i->string = malloc(length_size);
+  strncpy_s(i->string, length_size, string, length);
   i->string[length] = '\0';
   i->buffer = NULL;
   i->file = NULL;
@@ -599,12 +601,11 @@ void mpc_err_print_to(mpc_err_t *x, FILE *f) {
 }
 
 static void mpc_err_string_cat(char *buffer, int *pos, int *max, char const *fmt, ...) {
-  /* TODO: Error Checking on Length */
   int left = ((*max) - (*pos));
   va_list va;
   va_start(va, fmt);
   if (left < 0) { left = 0;}
-  (*pos) += vsprintf(buffer + (*pos), fmt, va);
+  (*pos) += vsprintf_s(buffer + (*pos), sizeof(buffer + (*pos)), fmt, va);
   va_end(va);
 }
 
@@ -1671,7 +1672,7 @@ mpc_parser_t *mpc_failf(const char *fmt, ...) {
 
   va_start(va, fmt);
   buffer = malloc(2048);
-  vsprintf(buffer, fmt, va);
+  vsprintf_s(buffer, 2048, fmt, va);
   va_end(va);
 
   buffer = realloc(buffer, strlen(buffer) + 1);
@@ -1746,7 +1747,7 @@ mpc_parser_t *mpc_expectf(mpc_parser_t *a, const char *fmt, ...) {
 
   va_start(va, fmt);
   buffer = malloc(2048);
-  vsprintf(buffer, fmt, va);
+  vsprintf_s(buffer, 2048, fmt, va);
   va_end(va);
 
   buffer = realloc(buffer, strlen(buffer) + 1);
@@ -1866,7 +1867,7 @@ mpc_parser_t *mpc_checkf(mpc_parser_t *a, mpc_check_t f, const char *fmt, ...) {
 
   va_start(va, fmt);
   buffer = malloc(2048);
-  vsprintf(buffer, fmt, va);
+  vsprintf_s(buffer, 2048, fmt, va);
   va_end(va);
 
   p = mpc_check (a, f, buffer);
@@ -1882,7 +1883,7 @@ mpc_parser_t *mpc_check_withf(mpc_parser_t *a, mpc_check_with_t f, void *x, cons
 
   va_start(va, fmt);
   buffer = malloc(2048);
-  vsprintf(buffer, fmt, va);
+  vsprintf_s(buffer, 2048, fmt, va);
   va_end(va);
 
   p = mpc_check_with (a, f, x, buffer);
