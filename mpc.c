@@ -856,12 +856,12 @@ static mpc_err_t *mpc_err_repeat(mpc_input_t *i, mpc_err_t *x, const char *prefi
 
     strcpy_s(expect, l_size, prefix);
     for (j = 0; j < x->expected_num-2; j++) {
-      strcat(expect, x->expected[j]); 
-      strcat(expect, ", ");
+      strcat_s(expect, sizeof expect, x->expected[j]); 
+      strcat_s(expect, sizeof expect, ", ");
     }
-    strcat(expect, x->expected[x->expected_num-2]);
-    strcat(expect, " or ");
-    strcat(expect, x->expected[x->expected_num-1]);
+    strcat_s(expect, sizeof expect, x->expected[x->expected_num-2]);
+    strcat_s(expect, sizeof expect, " or ");
+    strcat_s(expect, sizeof expect, x->expected[x->expected_num-1]);
 
     for (j = 0; j < x->expected_num; j++) { mpc_free(i, x->expected[j]); }
 
@@ -998,7 +998,7 @@ static mpc_val_t *mpcf_input_strfold(mpc_input_t *i, int n, mpc_val_t **xs) {
   if (n == 0) { return mpc_calloc(i, 1, 1); }
   for (j = 0; j < n; j++) { l += strlen(xs[j]); }
   xs[0] = mpc_realloc(i, xs[0], l + 1);
-  for (j = 1; j < n; j++) { strcat(xs[0], xs[j]); mpc_free(i, xs[j]); }
+  for (j = 1; j < n; j++) { strcat_s(xs[0], sizeof xs[0], xs[j]); mpc_free(i, xs[j]); }
   return xs[0];
 }
 
@@ -2332,7 +2332,7 @@ static mpc_val_t *mpcf_re_range(mpc_val_t *x) {
       tmp = mpc_re_range_escape_char(s[i+1]);
       if (tmp != NULL) {
         range = realloc(range, strlen(range) + strlen(tmp) + 1);
-        strcat(range, tmp);
+        strcat_s(range, sizeof range, tmp);
       } else {
         range = realloc(range, strlen(range) + 1 + 1);
         range[strlen(range) + 1] = '\0';
@@ -2345,7 +2345,7 @@ static mpc_val_t *mpcf_re_range(mpc_val_t *x) {
     else if (s[i] == '-') {
       if (s[i+1] == '\0' || i == 0) {
           range = realloc(range, strlen(range) + strlen("-") + 1);
-          strcat(range, "-");
+          strcat_s(range, sizeof range, "-");
       } else {
         start = s[i-1]+1;
         end = s[i+1]-1;
@@ -2537,7 +2537,7 @@ static mpc_val_t *mpcf_escape_new(mpc_val_t *x, const char *input, const char **
     while (output[i]) {
       if (*s == input[i]) {
         y = realloc(y, strlen(y) + strlen(output[i]) + 1);
-        strcat(y, output[i]);
+        strcat_s(y, sizeof y, output[i]);
         found = 1;
         break;
       }
@@ -2547,7 +2547,7 @@ static mpc_val_t *mpcf_escape_new(mpc_val_t *x, const char *input, const char **
     if (!found) {
       y = realloc(y, strlen(y) + 2);
       buff[0] = *s; buff[1] = '\0';
-      strcat(y, buff);
+      strcat_s(y, sizeof y, buff);
     }
 
     s++;
@@ -2575,7 +2575,7 @@ static mpc_val_t *mpcf_unescape_new(mpc_val_t *x, const char *input, const char 
           (*(s+1)) == output[i][1]) {
         y = realloc(y, strlen(y) + 1 + 1);
         buff[0] = input[i]; buff[1] = '\0';
-        strcat(y, buff);
+        strcat_s(y, sizeof y, buff);
         found = 1;
         s++;
         break;
@@ -2586,7 +2586,7 @@ static mpc_val_t *mpcf_unescape_new(mpc_val_t *x, const char *input, const char 
     if (!found) {
       y = realloc(y, strlen(y) + 1 + 1);
       buff[0] = *s; buff[1] = '\0';
-      strcat(y, buff);
+      strcat_s(y, sizeof y, buff);
     }
 
     if (*s == '\0') { break; }
@@ -2681,7 +2681,7 @@ mpc_val_t *mpcf_strfold(int n, mpc_val_t **xs) {
   xs[0] = realloc(xs[0], l + 1);
 
   for (i = 1; i < n; i++) {
-    strcat(xs[0], xs[i]); free(xs[i]);
+    strcat_s(xs[0], sizeof xs[0], xs[i]); free(xs[i]);
   }
 
   return xs[0];
