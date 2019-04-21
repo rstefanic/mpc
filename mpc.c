@@ -834,7 +834,7 @@ static mpc_err_t *mpc_err_repeat(mpc_input_t *i, mpc_err_t *x, const char *prefi
     size_t expected_size = strlen(prefix) + strlen(x->expected[0]) + 1;
     expect = mpc_malloc(i, expected_size);
     strcpy_s(expect, expected_size, prefix);
-    strcat(expect, x->expected[0]);
+    strcat_s(expect, expected_size, x->expected[0]);
     mpc_free(i, x->expected[0]);
     x->expected[0] = expect;
     return x;
@@ -856,7 +856,8 @@ static mpc_err_t *mpc_err_repeat(mpc_input_t *i, mpc_err_t *x, const char *prefi
 
     strcpy_s(expect, l_size, prefix);
     for (j = 0; j < x->expected_num-2; j++) {
-      strcat(expect, x->expected[j]); strcat(expect, ", ");
+      strcat(expect, x->expected[j]); 
+      strcat(expect, ", ");
     }
     strcat(expect, x->expected[x->expected_num-2]);
     strcat(expect, " or ");
@@ -1362,7 +1363,8 @@ int mpc_parse_pipe(const char *filename, FILE *pipe, mpc_parser_t *p, mpc_result
 
 int mpc_parse_contents(const char *filename, mpc_parser_t *p, mpc_result_t *r) {
 
-  FILE *f = fopen(filename, "rb");
+  FILE *f;
+  fopen_s(&f, filename, "rb");
   int res;
 
   if (f == NULL) {
@@ -3845,7 +3847,8 @@ mpc_err_t *mpca_lang_contents(int flags, const char *filename, ...) {
 
   va_list va;
 
-  FILE *f = fopen(filename, "rb");
+  FILE *f;
+  fopen_s(&f, filename, "rb");
 
   if (f == NULL) {
     err = mpc_err_file(filename, "Unable to open file!");
